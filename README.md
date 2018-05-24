@@ -24,9 +24,8 @@ $ pip3 install -r requirements.txt
 $ python3 main.py
 ```
 ### Controls
-
-*Movement: Arrow Keys
-*Transform into Wolf Link: W
-*Pick up item: Walk over it
-*Drop item: Spacebar
+* Movement: Arrow Keys
+* Transform into Wolf Link: W
+* Pick up item: Walk over it
+* Drop item: Spacebar
 
