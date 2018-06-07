@@ -15,7 +15,7 @@ GOLD = items.GOLD()
 SWORD = items.SWORD()
 SHIELD = items.SHIELD()
 BOW = items.BOW()
-GANON = enemies.GANNON()
+GANON = enemies.GANON()
 PORTAL = enemies.PORTAL()
 TEMPLE = TEMPLE()
 MIDNA = heroes.MIDNA()
@@ -89,17 +89,163 @@ while not GAME_OVER:
 
         if (keys[K_f]):
             if PLAYER.WEAPON == WAND:
-                orbs_list.append(heroes.ORB(math.ceil(PLAYER.PLAYER_POS[0]), math.ceil(PLAYER.PLAYER_POS[1]), PLAYER.DIRECTIOIN))
+                orbs_list.append(heroes.ORB(math.ceil(PLAYER.PLAYER_POS[0]), math.ceil(PLAYER.PLAYER_POS[1]), PLAYER.DIRECTION))
 
         """
         Timed Events
         """
 
+        if (event.type == USEREVENT):
+            if PORTAL.FRAME < 5:
+                PORTAL.FRAME += 1
+            else:
+                x = random.randint(1, 9)
+                y = random.randit(1, 9)
+                PORTAL.POS = [x, y]
+                GANON.GANON_POS = [x, y]
+                PORTAL_FRAME = 1
+
+        # Beast Oject Generator
+        elif (event.type == USEREVENT + 1):
+            NEW_BEAST = enemies.BEAST()
+            NEW_BEAST.PORTAL = enemies.PORTAL()
+            BEAST_LIST.append(NEW_BEAST)
+
+        # Beast with Portal Generator
+        elif (event.type = USEREVENT + 2):
+            for beast in BEAST_LIST:
+                if beast.PORTAL_APPEAR and beast.PRTAL.FRAME < 5:
+                    beast.PORTAL_FRAME += 1
+                elif not beast.SUMMONED:
+                    beast.PORTAL_APPEAR = False
+                    beast.APPEAR = True
+                    beast.SUMMONED = True
+                    beast.POS = [beast.PORTAL.POS[0], beast.PORTAL.POS[1]]
+
+        # Beast Movement (Hunts the Player)
+        elif (event.type == USEREVENT + 3):
+            for beast in BEAST_LIST:
+                if beast.APPEAR:
+                    if PLAYER.PLAYER_POS == beast.POS[coordinate]:
+                        beast.POS[coordinate] += 1
+                    else:
+                        beast.POS[coordinate] -= 1
+
+        # Orb Path Movement Animation
+        elif (event.type == USEREVENT + 4):
+            for orb in orbs_list
+                if orb.DIRECTION == 'd':
+                    orb.POS[1] += 1
+                elif orb.DIRECTION == 'u':
+                    orb.POS[1] -= 1
+                elif orb.DIRECTION == 'l':
+                    orb.POS += 1
+                elif orb.DIRECTION == 'r':
+                    orb.POS -= 1
+
+        # Pick up items
+        for item in GAME_ITEMS:
+            if PLAYER.PLAYER_POS == item.POS and item.PLACED:
+                PLAYER.PLAYER_INV.append(item)
+                item.PLACED = False
+                if item in GAME_WEAPONS:
+                    PLAYER.WEAPON = item
+    """
+    Rendering the map grid, sprites, and views
+    """
+
+    # Render the game grid
+    for row in range(MAPHEIGHT):
+        for column in range(MAPWIDTH):
+            DISPLAYSURFACE.blit(TEXTURES[GRID[row][column]], (column*TILESIZE,row*TILESIZE))
+
+    # Render Link
+    if PLAYER.TRANSFORM:
+        DISPLAYSURFACE.blit(PLAYER.WOLF, (PLAYER.PLAYER_POS[0]*TILESIZE, PLAYER.PLAYER_POS[1]*TILESIZE))
+    else:
+        DISPLAYSURFACE.blit(PLAYER.SPRITE_POS, (PLAYER.PLAYER_POS[0]*TILESIZE, PLAYER.PLAYER_POS[1]*TILESIZE))
+    # Render Temple
+    DISPLAYSURFACE.blit(TEMPLE.SPRITE, (TEMPLE.X_POS*TILESIZE, TEMPLE.Y_POS*TILESIZE))
+
+    # Render Midna
+    MIDNA.APPEARED = True
+    if MIDNA.APPEARED:
+        if PLAYER.TRANSFORM:
+            DISPLAYSURFACE.blit(MIDNA.SPRITE_POS, (PLAYER.PLAYER_POS[0]*TILESIZE + 20, PLAYER.PLAYER_POS[1] * TILESIZE + 35))
+        else:
+            DISPLAYSURFACE.blit(MIDNA.SPRITE_POS, (TEMPLE.X_POS*TILESIZE, TEMPLE.Y_POS*TILESIZE))
+
+    # Render armed items with player sprite
+    if PLAYER.WEAPON:
+        DISPLAYSURFACE.blit(PLAYER.WEAPON.IMAGE_ARMED, (PLAYER.PLAYER_POS[0]*TILESIZE, PLAYER.PLAYER_POS[1]*TILESIZE))
+
+    # Render beasts and portal
+    for beast in BEAST_LIST:
+        if beast.PORTAL_APPEAR:
+            DISPLAYSURFACE.blit(pygame.image.load(portal_images[beast.PORTAL.FRAME]), (beast.PORTAL.POS[0]*TILESIZE, beast.PORTAL.POS[1]*TILESIZE))
+
+    # Render items
+    for item in GAME_ITEMS:
+        if item.PLACED == True:
+            DISPLAYSURFACE.blit(item.IMAGE, (item.POS[0]*TILESIZE, item.POS[1]*TILESIZE))
+
+    # Render orbs
+    for orb in orbs_list:
+        if orb.POS == GANON.GANON_POS and GANON.VULNERABLE:
+            print('Ganon Health', GANON.HEALTH)
+            GANON.HEALTH -= 10
+        for beast in BEAST_LIST:
+            if orb.POS == beast.POS:
+                beast.APPEAR = False
+                BEAST_LIST.remove(beast)
+                orbs_list.remove(orb)
+        if orb.POS[0] > MAPWIDTH or orb.POS[0] < 0 or orb.POS[1] > MAPHEIGHT or orb.POS[1] < 0:
+            orbs_list.remove(orb)
+
+        DISPLAYSURFACE.blit(orb.IMAGE, (orb.POS[0]*TILESIZE, orb.POS[1]*TILESIZE))
+
+    # Render player inventory
+    INVENTORY_POSITION = 250
+    for item in PLAYER.PLAYER_INV:
+        DISPLAYSURFACE.blit(item.IMAGE, (INVENTORY_POSITION, MAPHEIGHT*TILESIZE+35))
+        INVENTORY_POSITION += 10
+        INVENTORY_TEXT = INVFONT.render(item.NAME, True, WHITE, BLACK)
+        DISPLAYSURFACE.blit(INVENTORY_TEXT, (INVENTORY_POSITION, MAPHEIGHT*TILESIZE+15))
+        INVENTORY_POSITION += 100
+
+    # Render player healthbar
+    PLAYER_HEALTH_BAR_TEXT = HEALTHFONT.render('LINK HEALTH:', True, GREEN, BLACK)
+    DISPLAYSURFACE.blit(PLAYER_HEALTH_BAR_TEXT, (15, MAPHEIGHT*TILESIZE-500))
+    DISPLAYSURFACE.blit(HEALTHFONT.render(str(PLAYER.HEALTH), True, GREEN, BLACK), (225, MAPHEIGHT*TILESIZE - 500))
+
+    # Render Ganon healthbar
+    PLAYER_MANA_BAR_TEXT = HEALTHFONT.render('GANON HEALTH:', True, RED, BLACK)
+    DISPLAYSURFACE.blit(PLAYER_MANA_BAR_TEXT, (650, MAPHEIGHT*TILESIZE-500))
+    DISPLAYSURFACE.blit(HEALTHFONT.render(str(GANON.HEALTH), True, RED, BLACK), (900, MAPHEIGHT*TILESIZE-500))
+
+    # Render trees
+    for tree in sorted(trees, key=lambda t: t.Y_POS):
+        DISPLAYSURFACE.blit(tree.SPRITE, (tree.X_POS, tree.Y_POS))
+
+    # Render Ganon and Portal
+    DISPLAYSURFACE.blit(pygame.image.load(portal_images[PORTAL.FRAME]), (GANON.GANON_POS[0]*TILESIZE, GANON.GANON_POS[1]*TILESIZE))
+    DISPLAYSURFACE.blit(GANON.GANON, (GANON.GANON_POS[0]*TILESIZE, GANON.GANON_POS[1]*TILESIZE))
 
 
+    pygame.display.update()
 
+    # End of game logic
 
+    # Player wins
+    if GANON.HEALTH <= 0:
+        GAME_OVER = True
+        print('CONGRATULATIONS, YOU HAVE VANQUISHED THE EVIL GANON!')
 
+   if PLAYER.HEALTH <= 0:
+       GAME_OVER = True
+       print('YOU DIED')
+
+   # End of Game Loop
 
 
 
