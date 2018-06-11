@@ -112,7 +112,7 @@ while not GAME_OVER:
             BEAST_LIST.append(NEW_BEAST)
 
         # Beast with Portal Generator
-        elif (event.type = USEREVENT + 2):
+        elif (event.type == USEREVENT + 2):
             for beast in BEAST_LIST:
                 if beast.PORTAL_APPEAR and beast.PRTAL.FRAME < 5:
                     beast.PORTAL_FRAME += 1
@@ -133,7 +133,7 @@ while not GAME_OVER:
 
         # Orb Path Movement Animation
         elif (event.type == USEREVENT + 4):
-            for orb in orbs_list
+            for orb in orbs_list:
                 if orb.DIRECTION == 'd':
                     orb.POS[1] += 1
                 elif orb.DIRECTION == 'u':
@@ -241,7 +241,7 @@ while not GAME_OVER:
         GAME_OVER = True
         print('CONGRATULATIONS, YOU HAVE VANQUISHED THE EVIL GANON!')
 
-   if PLAYER.HEALTH <= 0:
+    if PLAYER.HEALTH <= 0:
        GAME_OVER = True
        print('YOU DIED')
 
