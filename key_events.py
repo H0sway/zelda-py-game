@@ -31,7 +31,7 @@ wolf_r_images = [wolf_r_path+str(r)+'.png' for r in range(7)]
 wolf_l_images = [wolf_l_path+str(l)+'.png' for l in range(7)]
 
 class KeyEvents:
-    def __init__(self, player):
+    def __init__(self, PLAYER):
         self.PLAYER = PLAYER
         self.counter = 0
         self.wolf_counter = 0
@@ -99,7 +99,7 @@ class KeyEvents:
             self.PLAYER.WEAPON.PLACED = True
 
         # Drop weapon location
-            if self.PLAYER_DIRECTION = 'd':
+            if self.PLAYER_DIRECTION == 'd':
                 self.PLAYER.WEAPON.POS[0] = self.PLAYER.PLAYER_POS[0]
                 self.PLAYER.WEAPON.POS[1] = self.PLAYER.PLAYER_POS[1] - 1
             elif self.PLAYER.DIRECTION == 'u':
@@ -114,7 +114,7 @@ class KeyEvents:
 
         self.PLAYER.WEAPON = False
 
-    def key)w(self):
+    def key_w(self):
         self.PLAYER.TRANSFORMING()
 
 
